@@ -1,0 +1,4 @@
+{
+    "UPLOAD_FOLDER":"imdb-report-api/static/upload_folder",
+    "SESSION_TYPE":"filesystem"
+}

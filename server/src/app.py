@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, abort
 from helpers.flask_file_upload import get_file_from_request
 import json
 import os
@@ -10,7 +10,6 @@ from functionalities.most_watched_genres import get_most_watched_genres
 from functionalities.most_favourite_genres import get_most_favourite_genres
 
 app = Flask(__name__)
-# app.config.from_file("config.json", load=json.load)
 
 def send_file_format_error():
     abort(400, "Invalid file format.")
@@ -23,8 +22,10 @@ def secure_import_titles(filename):
     except (TypeError, IndexError):
         send_file_format_error()
 
-@app.route('/recommend', methods=['POST'])
-def recommend_title_from_list():
+# RESOURCE "MOVIES"
+
+@app.route('/movies/picku', methods=['POST'])
+def pick_unwatched_movie_from_list():
     filepath = get_file_from_request(app, allowed_extensions = ["csv"])
     titles = secure_import_titles(filepath)
     try:
@@ -39,14 +40,13 @@ def recommend_title_from_list():
     except KeyError:
         send_file_format_error()
         
-@app.route('/time_watching', methods=['POST'])
+@app.route('/movies/time', methods=['POST'])
 def get_total_minutes():
     filepath = get_file_from_request(app, allowed_extensions = ["csv"])
     titles = secure_import_titles(filepath)
     try:
         days, hours, minutes, total_minutes = calculate_time_watched(titles)
     except KeyError:
-        
         send_file_format_error()
     response = {
         'days': days,
@@ -56,29 +56,28 @@ def get_total_minutes():
         }
     return json.dumps(response, indent=4).decode("utf-16")
 
-@app.route('/report/movie/year', methods=['POST'])
-def create_movie_report_by_year():
-    separate_condition = request.args.get('separate_condition')
-    if separate_condition is None:
-        return 'No selected separate_condition', 400
-    # RATE YEAR
-    if separate_condition == "RATEY":
-        report_generator = get_movie_by_rating_year_report
-    # RELEASE YEAR
-    elif separate_condition == "RELEASEY":
-        report_generator = get_movie_by_release_year_report
-    else:
-        return 'Invalid by', 400
+@app.route('/movies/yreleased', methods=['POST'])
+def create_movie_report_by_year_released():
     filepath = get_file_from_request(app, allowed_extensions = ["csv"])
     titles = secure_import_titles(filepath)
     try:
-        report = report_generator(titles)
+        report = get_movie_by_rating_year_report(titles)
     except (KeyError, ValueError):
         send_file_format_error()
     return json.dumps(report, indent=4, sort_keys=True)
 
-@app.route('/report/movie/genre', methods=['POST'])
-def create_movie_report_by_genre():
+@app.route('/movies/yrated', methods=['POST'])
+def create_movie_report_by_year_rated():
+    filepath = get_file_from_request(app, allowed_extensions = ["csv"])
+    titles = secure_import_titles(filepath)
+    try:
+        report = get_movie_by_rating_year_report(titles)
+    except (KeyError, ValueError):
+        send_file_format_error()
+    return json.dumps(report, indent=4, sort_keys=True)
+
+@app.route('/movies/genre/mw', methods=['POST'])
+def create_movie_report_by_most_watched_genre():
     filepath = get_file_from_request(app, allowed_extensions = ["csv"])
     titles = secure_import_titles(filepath)
     try:
@@ -87,7 +86,7 @@ def create_movie_report_by_genre():
         send_file_format_error()
     return json.dumps(report, indent=4)
 
-@app.route('/favourite/movie/genre', methods=['POST'])
+@app.route('/movies/genre/fav', methods=['POST'])
 def create_movie_report_by_favourite_genre():
     filepath = get_file_from_request(app, allowed_extensions = ["csv"])
     titles = secure_import_titles(filepath)

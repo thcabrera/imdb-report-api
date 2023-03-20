@@ -1,6 +1,7 @@
 from flask import Flask, request, abort
 from helpers.flask_file_upload import get_file_from_request
 import json
+import os
 from converters.title_converter import import_titles
 from functionalities.total_minutes_watched import calculate_time_watched
 from functionalities.pick_unwatched_title import pick_unwatched_title
@@ -9,7 +10,7 @@ from functionalities.most_watched_genres import get_most_watched_genres
 from functionalities.most_favourite_genres import get_most_favourite_genres
 
 app = Flask(__name__)
-app.config.from_file("config.json", load=json.load)
+# app.config.from_file("config.json", load=json.load)
 
 def send_file_format_error():
     abort(400, "Invalid file format.")
@@ -96,4 +97,4 @@ def create_movie_report_by_favourite_genre():
         send_file_format_error()
     return json.dumps(report, indent=4)
 
-app.run()
+app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

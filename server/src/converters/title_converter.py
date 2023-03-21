@@ -1,13 +1,16 @@
 import csv
 from datetime import datetime
-import traceback
 
 class DataFormatError(Exception):
     pass
 
+# converts a string to a datetime with the format YYYY-MM-DD
 def convert_to_datetime(s):
     return datetime.strptime(s,'%Y-%m-%d')
 
+# applies the converter to the value. if an exception is raised,
+# it will check if the value is the empty string "" and if it can be None,
+# and will return None if True, otherwise will raise DataFormatError
 def convert_value(value, converter, nullable = False):
     try:
         return converter(value)
@@ -17,7 +20,7 @@ def convert_value(value, converter, nullable = False):
         return None
 
 def import_from_list(reg):
-    rating = {
+    return {
         "Position": int(reg[0]),
         "Const": reg[1],
         "Created": convert_value(reg[2], convert_to_datetime, False),
@@ -36,10 +39,9 @@ def import_from_list(reg):
         "Your Rating": convert_value(reg[15], int, True),
         "Date Rated": convert_value(reg[16], convert_to_datetime, True)
     }
-    return rating
 
 def import_from_ratings(reg):
-    rating = {
+    return {
         "Const": reg[0],
         "Your Rating": int(reg[1]),
         "Date Rated": convert_value(reg[2], convert_to_datetime, False),
@@ -54,7 +56,6 @@ def import_from_ratings(reg):
         "Release Date": convert_value(reg[11], convert_to_datetime, False),
         "Directors": list(map(lambda g: g.strip(), reg[12].split(',')))
     }
-    return rating
 
 def import_titles(file_path):
     try:
@@ -73,5 +74,4 @@ def import_titles(file_path):
                 ratings.append(rating)
         return ratings
     except (TypeError, IndexError, KeyError, ValueError) as e:
-        print(f"[DEBUG] {traceback.print_exception(e)}")
         raise DataFormatError

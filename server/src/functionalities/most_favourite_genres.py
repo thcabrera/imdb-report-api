@@ -16,13 +16,12 @@ added_value_by_rating = {
 def separate_by_genre(movies):
     movies_by_genre = {} # genre -> list of movies
     for movie in movies:
-        # 'Action, Adventure' -> split(',') -> ['Action',' Adventure'] -> strip() -> ['Action','Adventure']
-        genres = list(map(lambda g: g.strip(), movie['Genres'].split(',')))
+        genres = movie['Genres']
         genres_and_comb = list(map(lambda g: str(g), get_all_sublists(genres)))
         for genre in genres_and_comb:
             if genre not in movies_by_genre:
                 movies_by_genre[genre] = 0
-            movies_by_genre[genre] += added_value_by_rating[int(movie['Your Rating'])]
+            movies_by_genre[genre] += added_value_by_rating[movie['Your Rating']]
     return movies_by_genre
 
 # TODO SOLUCIONAR ESTO, NO ESTA HACIENDO LO QUE QUIERO

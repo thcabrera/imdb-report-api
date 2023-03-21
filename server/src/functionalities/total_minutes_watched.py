@@ -9,7 +9,8 @@ def get_days_hours_minutes(total_minutes):
 
 # returns days, hours and minutes
 def calculate_time_watched(titles):
-    ratings = filter_movies(titles)
-    total_minutes = sum(map(lambda r: int(r['Runtime (mins)']), ratings))
+    # only movies have a runtime value
+    titles = filter_movies(titles)
+    total_minutes = sum(map(lambda t: t['Runtime (mins)'], titles))
     days, hours, minutes = get_days_hours_minutes(total_minutes)
     return days, hours, minutes, total_minutes

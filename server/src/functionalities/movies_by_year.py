@@ -2,10 +2,10 @@ from datetime import datetime
 from functionalities.title_filter import filter_movies
 
 def get_rating_year(rating):
-    return int(datetime.strptime(rating['Date Rated'],'%Y-%m-%d').year)
+    return rating['Date Rated'].year
 
 def get_release_year(rating):
-    return int(rating['Year'])
+    return rating['Year']
 
 def process_rating_by_release_year(ratings_by_release_year, rating, get_year):
     release_year = get_year(rating)
